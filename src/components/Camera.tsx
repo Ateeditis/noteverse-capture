@@ -1,6 +1,5 @@
-
 import React, { useRef, useState, useCallback } from 'react';
-import { Camera, FlipCameraIos, ImagePlus } from 'lucide-react';
+import { Camera, RefreshCw, ImagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -37,11 +36,9 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
     }
   }, [isFrontCamera]);
   
-  // Start camera when component mounts
   React.useEffect(() => {
     startCamera();
     
-    // Cleanup function to stop camera when unmounting
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
@@ -51,13 +48,11 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
   }, [startCamera]);
   
   const toggleCamera = () => {
-    // Stop current stream
     if (videoRef.current && videoRef.current.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
     }
     
-    // Toggle camera
     setIsFrontCamera(prev => !prev);
   };
   
@@ -68,14 +63,11 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
       const video = videoRef.current;
       const canvas = canvasRef.current;
       
-      // Set canvas dimensions to match video
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
-      // Draw video frame to canvas
       const context = canvas.getContext('2d');
       if (context) {
-        // If using front camera, flip the image horizontally
         if (isFrontCamera) {
           context.translate(canvas.width, 0);
           context.scale(-1, 1);
@@ -83,7 +75,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
         
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Convert canvas to data URL
         const imageData = canvas.toDataURL('image/jpeg', 0.9);
         onCapture(imageData);
       }
@@ -107,10 +98,8 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
   
   return (
     <div className="relative w-full h-full flex flex-col items-center animate-fade-in">
-      {/* Hidden canvas for capturing images */}
       <canvas ref={canvasRef} className="hidden"></canvas>
       
-      {/* Camera preview */}
       <div className="relative w-full max-w-md overflow-hidden rounded-xl aspect-[3/4] bg-black flex items-center justify-center">
         <video
           ref={videoRef}
@@ -132,7 +121,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
           </div>
         )}
         
-        {/* Camera interface overlay */}
         <div className="absolute inset-0 pointer-events-none border-2 border-white/20 rounded-xl">
           <div className="absolute top-0 left-0 right-0 h-1/3 border-b border-white/20"></div>
           <div className="absolute bottom-0 left-0 right-0 h-1/3 border-t border-white/20"></div>
@@ -140,7 +128,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
         </div>
       </div>
       
-      {/* Camera controls */}
       <div className="mt-4 w-full max-w-md flex items-center justify-between gap-4 px-2">
         <Button 
           variant="outline" 
@@ -167,7 +154,7 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onCapture, onCancel }
             className="h-12 w-12 rounded-full"
             onClick={toggleCamera}
           >
-            <FlipCameraIos className="h-5 w-5" />
+            <RefreshCw className="h-5 w-5" />
           </Button>
           
           <div className="relative h-12 w-12">
