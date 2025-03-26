@@ -14,24 +14,18 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface SettingsDialogProps {
   className?: string;
 }
 
 const SettingsDialog = ({ className }: SettingsDialogProps) => {
-  const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
+  const { theme, toggleTheme } = useTheme();
   const [highQualityCamera, setHighQualityCamera] = React.useState(true);
   const [autoSaveNotes, setAutoSaveNotes] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState(true);
   
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    // In a real app, we would apply the theme here
-    toast.success(`Theme changed to ${newTheme} mode`);
-  };
-
   return (
     <Sheet>
       <SheetTrigger asChild>
