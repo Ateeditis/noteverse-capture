@@ -1,10 +1,31 @@
 
 import { AIResult } from '@/lib/types';
+import { pipeline } from '@huggingface/transformers';
 
-const DEMO_MODE = true; // Set to false to use actual AI API
+const DEMO_MODE = false; // Set to false to use the actual LLM
 
-// This is a mock AI service for demo purposes
-// In a real app, this would connect to OpenAI API or similar
+// Model configuration
+const MODEL_ID = 'MBZUAI/LaMini-Flan-T5-248M';
+
+// Global reference to the model pipeline
+let textGenerationPipeline: any = null;
+
+// Function to load the model on demand
+const loadModel = async () => {
+  if (!textGenerationPipeline) {
+    console.log('Loading text generation model...');
+    try {
+      textGenerationPipeline = await pipeline('text2text-generation', MODEL_ID);
+      console.log('Model loaded successfully');
+    } catch (error) {
+      console.error('Error loading model:', error);
+      throw new Error('Failed to load the language model');
+    }
+  }
+  return textGenerationPipeline;
+};
+
+// This function generates a structured note from input text
 export async function generateNoteFromText(text: string): Promise<AIResult> {
   if (DEMO_MODE) {
     // Simulate API delay
@@ -45,43 +66,35 @@ export async function generateNoteFromText(text: string): Promise<AIResult> {
   }
   
   try {
-    // In a real implementation, you would:
-    // 1. Send the text to an AI API with a well-crafted prompt
-    // 2. Parse the response
-    // 3. Return the generated note
+    // Load the model if not already loaded
+    const model = await loadModel();
+    
+    // Create a prompt that instructs the model to generate a structured note
+    const prompt = `
+Create a structured note in Markdown format from the following text:
+Format the note with a clear title, sections with headings, and bullet points for key information.
+Text: ${text}
+`;
 
-    // Example with OpenAI API (pseudocode)
-    // const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${API_KEY}`
-    //   },
-    //   body: JSON.stringify({
-    //     model: 'gpt-3.5-turbo',
-    //     messages: [
-    //       {
-    //         role: 'system',
-    //         content: 'You are a helpful assistant that creates well-structured notes from text. Extract key information, organize it into sections, and format it using Markdown.'
-    //       },
-    //       {
-    //         role: 'user',
-    //         content: text
-    //       }
-    //     ],
-    //     temperature: 0.3
-    //   })
-    // });
-    
-    // const result = await response.json();
-    // const content = result.choices[0].message.content;
-    
-    // // Extract a title from the first line of the content
-    // const title = content.split('\n')[0].replace(/^#+ /, '');
-    
-    // return { content, title };
+    // Generate the note using the model
+    const result = await model(prompt, {
+      max_length: 1024,
+      temperature: 0.3,
+    });
 
-    throw new Error('AI service not implemented');
+    // Extract the generated text
+    const generatedText = result[0].generated_text;
+    
+    // Extract a title from the first line of the content
+    const lines = generatedText.split('\n').filter(line => line.trim() !== '');
+    const title = lines.length > 0 
+      ? lines[0].replace(/^#+ /, '').trim() 
+      : 'Generated Note';
+
+    return {
+      title,
+      content: generatedText,
+    };
   } catch (error) {
     console.error('AI service error:', error);
     throw new Error('Failed to generate note from text');
