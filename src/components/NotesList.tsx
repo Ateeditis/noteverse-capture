@@ -34,7 +34,12 @@ const NotesList: React.FC<NotesListProps> = ({
     <div className={cn("w-full", className)}>
       {notes.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-fade-in">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+          <div 
+            className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 cursor-pointer hover:bg-muted/80 transition-colors"
+            onClick={onNewNote}
+            role="button"
+            aria-label="Create new note"
+          >
             <PlusCircle className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-medium mb-2">No notes yet</h3>
