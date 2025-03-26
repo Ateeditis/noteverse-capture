@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Settings, Share2 } from 'lucide-react';
+import { ChevronLeft, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import SettingsDialog from './SettingsDialog';
 
 interface HeaderProps {
   title?: string;
@@ -53,9 +54,7 @@ const Header: React.FC<HeaderProps> = ({
           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-            <Settings className="h-4 w-4" />
-          </Button>
+          <SettingsDialog />
         </div>
       )}
     </header>
